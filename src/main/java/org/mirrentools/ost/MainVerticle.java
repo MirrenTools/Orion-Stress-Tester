@@ -271,7 +271,7 @@ public class MainVerticle extends AbstractVerticle {
 		MicrometerMetricsOptions metricsOptions = new MicrometerMetricsOptions().setEnabled(true);
 		metricsOptions.setMicrometerRegistry(new SimpleMeterRegistry());
 		VertxOptions vertxOptions = new VertxOptions().setMetricsOptions(metricsOptions);
-		if (options.getCount() > 100 || options.getInterval() > 1000 * 150) {
+		if ((options.getCount() > 100 || options.getInterval() > 1000 * 150) && instances < 100) {
 			vertxOptions.setWorkerPoolSize(100);
 		}
 		Vertx newVertx = Vertx.vertx(vertxOptions);
