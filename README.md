@@ -1,4 +1,6 @@
 # Orion-Stress-Tester (OST)
+Read this in other languages: [English](./README.md), [简体中文](./README.zh.md).
+
 A simple, efficient and accurate stress tester, support HTTP, WebSocket and TCP
 
 ## How to run
