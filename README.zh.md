@@ -1,7 +1,13 @@
 # Orion-Stress-Tester (OST)
+其他语言版本: [English](./README.md), [简体中文](./README.zh.md).
+
 一个简易,高效,精准的压力测试器,支持HTTP,WebSocket,TCP
 ## 如何运行
-该项目基于[https://vertx.io/](vert.x 3.8.5)创建,运行环境要求&gt;= java 1.8(免JDK教程),编码与测试环境java 1.8.0_121
+该项目基于 [vert.x 3.8.5](https://vertx.io/) 创建,
+
+运行环境要求&gt;= java 1.8(免JDK教程),
+
+编码与测试环境java 1.8.0_121
 
 方式一:
 
