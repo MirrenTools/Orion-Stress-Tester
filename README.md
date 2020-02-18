@@ -34,7 +34,10 @@ instances(int): The number of instances the test task runs. default 0 of process
 ```
 
 ## Client description
-The client is written based on Vue 2.6.10, and you can modify it through the client project [Orion-Stress-Tester-Client](https://github.com/MirrenTools/Orion-Stress-Tester-Client)
+The client is written based on Vue , and you can modify it through the client project [Orion-Stress-Tester-Client](https://github.com/MirrenTools/Orion-Stress-Tester-Client)
 
 ## Client example
-![example-en](https://raw.githubusercontent.com/MirrenTools/Orion-Stress-Tester/master/data/example-en.png)
+[Image link](https://github.com/MirrenTools/Orion-Stress-Tester/blob/master/data/example-en.png)
+
+
+![Click on the front Image link](https://raw.githubusercontent.com/MirrenTools/Orion-Stress-Tester/master/data/example-en.png)

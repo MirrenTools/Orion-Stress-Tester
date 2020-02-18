@@ -178,30 +178,33 @@ public class OstWebSocketVerticle extends AbstractVerticle {
 				}
 				vertx.executeBlocking(exec -> {
 					try {
+						long initTime = System.currentTimeMillis();
 						for (int i = 0; i < options.getAverage(); i++) {
 							int when = (i + 1);
-							boolean ended = (i == options.getAverage() - 1);
-							if (LOG.isDebugEnabled()) {
-								LOG.debug("WebSocket正在发送信息-->第[" + count + "-" + when + "]次!");
-							}
-							if (webSocket.isClosed()) {
-								exec.tryComplete();
-								return;
-							}
-							webSocket.writeTextMessage(options.getBody() == null ? "" : options.getBody().toString(), send -> {
-								if (ended) {
-									if (!options.isKeepAlive()) {
-										webSocket.close();
-									}
-									exec.tryComplete();
+							boolean ended = (when == options.getAverage());
+							long startTime = System.currentTimeMillis() - initTime;
+							long oriTime = options.getInterval() * i;
+							long execTime = startTime > oriTime ? 1 : (oriTime - startTime);
+							vertx.setTimer(execTime < 1 ? 1 : execTime, tid -> {
+								if (LOG.isDebugEnabled()) {
+									LOG.debug("WebSocket正在发送信息-->第[" + count + "-" + when + "]次!");
 								}
+								if (webSocket.isClosed()) {
+									exec.tryComplete();
+									return;
+								}
+								webSocket.writeTextMessage(options.getBody() == null ? "" : options.getBody().toString(), send -> {
+									if (ended) {
+										if (!options.isKeepAlive()) {
+											webSocket.close();
+										}
+										exec.tryComplete();
+									}
+								});
 							});
-							try {
-								Thread.sleep(options.getInterval());
-							} catch (Exception e) {
-							}
 						}
 					} catch (Exception e) {
+						System.out.println(e);
 						exec.fail(e);
 					}
 				}, end -> {
@@ -228,7 +231,7 @@ public class OstWebSocketVerticle extends AbstractVerticle {
 							return;
 						}
 						LocalDataCounter.incrementAndGet(Constant.REQUEST_FAILED_PREFIX + id);
-						info.setBody(res.cause().getMessage());
+						info.setBody(res.cause() == null ? "" : res.cause().getMessage());
 						if (init) {
 							httpClient.close();
 						}

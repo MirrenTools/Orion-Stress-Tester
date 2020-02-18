@@ -62,7 +62,7 @@ public class MainLauncher extends Launcher {
 	 *          instance.
 	 */
 	public void beforeStartingVertx(VertxOptions options) {
-		options.setBlockedThreadCheckInterval(1000 * 60 * 60);
+		options.setBlockedThreadCheckInterval(1000 * 60);
 		options.setPreferNativeTransport(true);
 	}
 

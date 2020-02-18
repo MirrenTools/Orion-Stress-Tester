@@ -274,6 +274,7 @@ public class MainVerticle extends AbstractVerticle {
 		if ((options.getCount() > 100 || options.getInterval() > 1000 * 150) && instances < 100) {
 			vertxOptions.setWorkerPoolSize(100);
 		}
+		vertxOptions.setBlockedThreadCheckInterval(1000 * 60 * 60);
 		Vertx newVertx = Vertx.vertx(vertxOptions);
 		LocalDataVertx.put(options.getId(), newVertx);
 		JsonObject config = new JsonObject().put("optionsId", options.getId());

@@ -141,23 +141,32 @@ public class OstTcpVerticle extends AbstractVerticle {
 				if (options.isPrintResInfo()) {
 					netSocket.handler(buffer::appendBuffer);
 				}
+
 				vertx.executeBlocking(exec -> {
 					try {
+						long initTime = System.currentTimeMillis();
 						for (int i = 0; i < options.getAverage(); i++) {
 							int when = (i + 1);
-							boolean ended = (i == options.getAverage() - 1);
-							if (LOG.isDebugEnabled()) {
-								LOG.debug("TCP正在发送信息-->第[" + count + "-" + when + "]次!");
-							}
-							netSocket.write(options.getBody() == null ? "" : options.getBody().toString(), send -> {
-								if (ended) {
-									if (!options.isKeepAlive()) {
-										netSocket.close();
-									}
-									exec.tryComplete();
+							boolean ended = (when == options.getAverage());
+							long startTime = System.currentTimeMillis() - initTime;
+							long oriTime = options.getInterval() * i;
+							long execTime = startTime > oriTime ? 1 : (oriTime - startTime);
+							vertx.setTimer(execTime < 1 ? 1 : execTime, tid -> {
+								if (LOG.isDebugEnabled()) {
+									LOG.debug("TCP正在发送信息-->第[" + count + "-" + when + "]次!");
 								}
+								netSocket.endHandler(close -> {
+									exec.tryComplete();
+								});
+								netSocket.write(options.getBody() == null ? "" : options.getBody().toString(), send -> {
+									if (ended) {
+										if (!options.isKeepAlive()) {
+											netSocket.close();
+										}
+										exec.tryComplete();
+									}
+								});
 							});
-							Thread.sleep(options.getInterval());
 						}
 					} catch (Exception e) {
 						exec.fail(e);
@@ -181,7 +190,7 @@ public class OstTcpVerticle extends AbstractVerticle {
 							return;
 						}
 						LocalDataCounter.incrementAndGet(Constant.REQUEST_FAILED_PREFIX + id);
-						info.setBody(res.cause().getMessage());
+						info.setBody(res.cause() == null ? "" : res.cause().getMessage());
 						if (init) {
 							netClient.close();
 						}
@@ -194,7 +203,7 @@ public class OstTcpVerticle extends AbstractVerticle {
 					return;
 				}
 				LocalDataCounter.incrementAndGet(Constant.REQUEST_FAILED_PREFIX + id);
-				info.setBody(res.cause().getMessage());
+				info.setBody(res.cause() == null ? "" : res.cause().getMessage());
 				if (init) {
 					netClient.close();
 				}

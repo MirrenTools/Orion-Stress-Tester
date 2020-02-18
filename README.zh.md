@@ -2,6 +2,9 @@
 其他语言版本: [English](./README.md), [简体中文](./README.zh.md).
 
 一个简易,高效,精准的压力测试器,支持HTTP,WebSocket,TCP
+
+QQ交流群:564658018 <a target="_blank" href="//shang.qq.com/wpa/qunwpa?idkey=33587697e57f80420543482163cacdc5695edcbb6cfce519737d416130e7f058"><img border="0" src="//pub.idqqimg.com/wpa/images/group.png" alt="加入QQ交流群" title="加入QQ交流群"></a>
+
 ## 如何运行
 该项目基于 [vert.x 3.8.5](https://vertx.io/) 创建,
 
@@ -32,7 +35,10 @@ instances(int): 测试任务运行的实例数量,默认0=处理器数量,如果
 ```
 
 ## 客户端说明
-客户端基于vue 2.6.10编写,你可以通过客户端项目[Orion-Stress-Tester-Client](https://github.com/MirrenTools/Orion-Stress-Tester-Client)进行修改
+客户端基于vue 编写,你可以通过客户端项目[Orion-Stress-Tester-Client](https://github.com/MirrenTools/Orion-Stress-Tester-Client)进行修改
 
 ## 客户端演示
-![example-zh](https://raw.githubusercontent.com/MirrenTools/Orion-Stress-Tester/master/data/example-zh.png)
+[图片链接](https://github.com/MirrenTools/Orion-Stress-Tester/blob/master/data/example-en.png)
+
+
+![点击前面的图片链接](https://raw.githubusercontent.com/MirrenTools/Orion-Stress-Tester/master/data/example-zh.png)
