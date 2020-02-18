@@ -38,7 +38,8 @@ instances(int): 测试任务运行的实例数量,默认0=处理器数量,如果
 客户端基于vue 编写,你可以通过客户端项目[Orion-Stress-Tester-Client](https://github.com/MirrenTools/Orion-Stress-Tester-Client)进行修改
 
 ## 客户端演示
-[图片链接](https://github.com/MirrenTools/Orion-Stress-Tester/blob/master/data/example-en.png)
+[图片链接1](https://gitee.com/mirren/Orion-Stress-Tester/blob/master/data/example-zh.png)
+[图片链接2](https://github.com/MirrenTools/Orion-Stress-Tester/blob/master/data/example-zh.png)
 
 
 ![点击前面的图片链接](https://raw.githubusercontent.com/MirrenTools/Orion-Stress-Tester/master/data/example-zh.png)

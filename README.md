@@ -26,7 +26,6 @@ java -jar  Orion-Stress-Tester-fat.jar
 Visit in browser: http://127.0.0.1:7090
 
 ## Config description
-Read this in other languages: [English](./README.md), [简体中文](./README.zh.md).
 The configuration file of OST is config.json in the data folder
 ```
 httpPort(int): Port, default 7090
@@ -37,7 +36,7 @@ instances(int): The number of instances the test task runs. default 0 of process
 The client is written based on Vue , and you can modify it through the client project [Orion-Stress-Tester-Client](https://github.com/MirrenTools/Orion-Stress-Tester-Client)
 
 ## Client example
-[Image link](https://github.com/MirrenTools/Orion-Stress-Tester/blob/master/data/example-en.png)
-
+[Image link1](https://github.com/MirrenTools/Orion-Stress-Tester/blob/master/data/example-en.png)
+[Image link2](https://gitee.com/mirren/Orion-Stress-Tester/blob/master/data/example-en.png)
 
 ![Click on the front Image link](https://raw.githubusercontent.com/MirrenTools/Orion-Stress-Tester/master/data/example-en.png)
