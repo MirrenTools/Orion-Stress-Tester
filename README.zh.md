@@ -25,6 +25,9 @@ mvn clean package
 将根目录的data文件夹、webroot文件夹与target中的 Orion-Stress-Tester-fat.jar复制到一个文件夹中执行
 java -jar  Orion-Stress-Tester-fat.jar
 ```
+
+如果要进行大量的测试任务,推荐根据自己电脑的配置设置JVM的 -Xms -Xmx 
+
 在浏览器访问: http://127.0.0.1:7090
 
 ## 配置文件说明

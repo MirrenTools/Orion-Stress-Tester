@@ -23,6 +23,9 @@ mvn clean package
 Copy the root data folder, webroot folder and orion-stress-tester-fat.jar in target to one folder for execution
 java -jar  Orion-Stress-Tester-fat.jar
 ```
+
+If you want to perform a large number of test tasks, it is recommended to set the - XMS - Xmx of the JVM according to the configuration of your own computer
+
 Visit in browser: http://127.0.0.1:7090
 
 ## Config description
