@@ -17,12 +17,16 @@ public enum OstCommand {
 	TEST_RESPONSE(3),
 	/** 日志输出:4 */
 	TEST_LOG_RESPONSE(4),
+	/** 测试任务提交进度 */
+	TEST_SUBMIT_PROGRESS(5),
 	/** 测试完成 */
 	TEST_COMPLETE(99),
 	/** 无效的请求参数或缺失必填的参数:412 */
 	MISSING_PARAMETER(412),
 	/** 未知异常:500 */
 	ERROR(500),
+	/** 超过GC开销限制:501 */
+	GC_OVERHEAD_LIMIT(501),
 	/** JVM的内存等指标:1000 */
 	JVM_METRIC(1000);
 

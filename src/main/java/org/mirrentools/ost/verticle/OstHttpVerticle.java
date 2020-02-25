@@ -88,13 +88,13 @@ public class OstHttpVerticle extends AbstractVerticle {
 						int count = options.getCount();
 						int average = options.getAverage();
 						for (int i = 1; i <= count; i++) {
-							if (socket.isClosed()) {
+							if (socket == null || socket.isClosed()) {
 								break;
 							}
 							int size = i;
 							vertx.executeBlocking(exec -> {
 								for (int j = 1; j <= average; j++) {
-									if (socket.isClosed()) {
+									if (socket == null || socket.isClosed()) {
 										break;
 									}
 									JsonObject message = new JsonObject();
@@ -105,6 +105,9 @@ public class OstHttpVerticle extends AbstractVerticle {
 									vertx.eventBus().send(EventBusAddress.HTTP_TEST_HANDLER, message);
 								}
 								try {
+									OstResponseInfo proEnd = new OstResponseInfo();
+									proEnd.setCount(size);
+									writeMsg(proEnd, OstCommand.TEST_SUBMIT_PROGRESS, socket);
 									Thread.sleep(options.getInterval());
 									exec.complete();
 								} catch (InterruptedException e) {
@@ -145,13 +148,11 @@ public class OstHttpVerticle extends AbstractVerticle {
 		}
 		boolean init = msg.body().getBoolean("init");
 		ServerWebSocket socket = LocalDataServerWebSocket.get(id);
-		if (socket.isClosed()) {
+		if (socket == null || socket.isClosed()) {
 			return;
 		}
 		OstRequestOptions options = LocalDataRequestOptions.get(id);
-		if (socket.isClosed()) {
-			return;
-		}
+
 		final HttpClient httpClient;
 		if (init) {
 			HttpClientOptions hOptions = new HttpClientOptions();
@@ -181,7 +182,7 @@ public class OstHttpVerticle extends AbstractVerticle {
 		}
 
 		OstHttpRequestHandler.requestAbs(httpClient, options, res -> {
-			if (socket.isClosed()) {
+			if (socket == null || socket.isClosed()) {
 				return;
 			}
 			OstResponseInfo info = new OstResponseInfo();
@@ -194,17 +195,17 @@ public class OstHttpVerticle extends AbstractVerticle {
 				if (options.isPrintResInfo()) {
 					res.result().bodyHandler(body -> {
 						info.setBody(body.toString());
-						writeMsg(info, socket);
+						writeMsg(info, OstCommand.TEST_LOG_RESPONSE, socket);
 					});
 				}
 			} else {
-				if (socket.isClosed()) {
+				if (socket == null || socket.isClosed()) {
 					return;
 				}
 				LocalDataCounter.incrementAndGet(Constant.REQUEST_FAILED_PREFIX + id);
 				info.setBody(res.cause().getMessage());
 				info.setState(0);
-				writeMsg(info, socket);
+				writeMsg(info, OstCommand.TEST_LOG_RESPONSE, socket);
 			}
 		});
 	}
@@ -213,13 +214,16 @@ public class OstHttpVerticle extends AbstractVerticle {
 	 * 响应信息到前端
 	 * 
 	 * @param info
+	 *          响应信息
+	 * @param command
+	 *          信息类型
 	 * @param socket
 	 */
-	private void writeMsg(OstResponseInfo info, ServerWebSocket socket) {
-		if (socket.isClosed()) {
+	private void writeMsg(OstResponseInfo info, OstCommand command, ServerWebSocket socket) {
+		if (socket == null || socket.isClosed()) {
 			return;
 		}
-		String result = ResultFormat.success(OstCommand.TEST_LOG_RESPONSE, info.toJson());
+		String result = ResultFormat.success(command, info.toJson());
 		socket.writeTextMessage(result);
 	}
 

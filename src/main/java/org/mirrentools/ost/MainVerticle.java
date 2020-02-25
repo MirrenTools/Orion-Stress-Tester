@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.mirrentools.ost.common.Constant;
 import org.mirrentools.ost.common.JvmMetricsUtil;
@@ -86,6 +87,8 @@ import io.vertx.micrometer.MicrometerMetricsOptions;
 public class MainVerticle extends AbstractVerticle {
 	/** 日志 */
 	private final Logger LOG = LoggerFactory.getLogger(MainVerticle.class);
+	/** GC overhead limit exceeded */
+	private boolean gcOverheadLimit = false;
 	/** 实例的数量 */
 	private int instances;
 
@@ -102,7 +105,6 @@ public class MainVerticle extends AbstractVerticle {
 	public void start(Promise<Void> startPromise) throws Exception {
 		instances = config().getInteger("instances", JvmMetricsUtil.availableProcessors());
 		Integer port = config().getInteger("httpPort", 7090);
-
 		Router router = Router.router(vertx);
 		router.route().handler(StaticHandler.create("webroot").setDefaultContentEncoding("UTF-8"));
 		vertx.createHttpServer().requestHandler(router).webSocketHandler(socket -> {
@@ -115,6 +117,37 @@ public class MainVerticle extends AbstractVerticle {
 					LOG.debug("\"query: \" + socket.query()");
 				}
 			}
+			if (gcOverheadLimit) {
+				String failed = ResultFormat.failed(OstCommand.GC_OVERHEAD_LIMIT, "The task exceeds the processing capacity of the console. please set the startup parameter to increase the JVM memory", "");
+				socket.writeTextMessage(failed);
+				socket.end();
+				return;
+			}
+			// 关闭或结束时清理请求
+			Promise<String> clearRequest = Promise.promise();
+			clearRequest.future().setHandler(res -> {
+				String id = res.result();
+				LocalDataServerWebSocket.remove(id);
+				LocalDataRequestOptions.remove(id);
+				LocalDataCounter.remove(id);
+				LocalDataBoolean.remove(id);
+				Vertx remove = LocalDataVertx.remove(id);
+				if (remove != null) {
+					Set<String> deploymentIDs = remove.deploymentIDs();
+					for (String did : deploymentIDs) {
+						remove.undeploy(did);
+					}
+					remove.close(close -> {
+						if (close.failed()) {
+							LOG.error("关闭WebSocket->关闭测试服务->" + id + "-->异常", close.cause());
+						} else {
+							if (LOG.isDebugEnabled()) {
+								LOG.debug("关闭WebSocket->关闭测试服务->" + id + "-->成功");
+							}
+						}
+					});
+				}
+			});
 			// 处理用户的信息
 			socket.handler(buf -> {
 				try {
@@ -124,6 +157,7 @@ public class MainVerticle extends AbstractVerticle {
 					}
 					Integer code = body.getInteger(Constant.CODE);
 					if (code.equals(OstCommand.CANCEL.value())) {
+						clearRequest.tryComplete(socket.textHandlerID());
 						socket.end();
 					} else if (code.equals(OstCommand.SUBMIT_TEST.value())) {
 						JsonObject data = body.getJsonObject(Constant.DATA);
@@ -136,7 +170,7 @@ public class MainVerticle extends AbstractVerticle {
 								if (LOG.isDebugEnabled()) {
 									LOG.debug("加载并检查请求参数-->成功:" + options);
 								}
-								vertx.setTimer(1000, tid -> {
+								vertx.setPeriodic(1000, tid -> {
 									if (socket.isClosed()) {
 										vertx.cancelTimer(tid);
 										return;
@@ -146,28 +180,14 @@ public class MainVerticle extends AbstractVerticle {
 									result.put("totalMemory", JvmMetricsUtil.totalMemory());
 									result.put("maxMemory", JvmMetricsUtil.maxMemory());
 									result.put("freeMemory", JvmMetricsUtil.freeMemory());
+									LOG.info("执行发送信息给客户端-->当前服务器性能:" + result);
 									String metrics = ResultFormat.success(OstCommand.JVM_METRIC, result);
 									socket.writeTextMessage(metrics);
 								});
 								submitTest(options, socket);
 								// 设置Socket关闭事件
 								socket.endHandler(end -> {
-									LocalDataServerWebSocket.remove(id);
-									LocalDataRequestOptions.remove(id);
-									LocalDataCounter.remove(id);
-									LocalDataBoolean.remove(id);
-									Vertx remove = LocalDataVertx.remove(id);
-									if (remove != null) {
-										remove.close(close -> {
-											if (close.failed()) {
-												LOG.error("关闭WebSocket->关闭测试服务->" + id + "-->异常", close.cause());
-											} else {
-												if (LOG.isDebugEnabled()) {
-													LOG.debug("关闭WebSocket->关闭测试服务->" + id + "-->成功");
-												}
-											}
-										});
-									}
+									clearRequest.tryComplete(socket.textHandlerID());
 								});
 							} else {
 								if (LOG.isDebugEnabled()) {
@@ -276,6 +296,21 @@ public class MainVerticle extends AbstractVerticle {
 		}
 		vertxOptions.setBlockedThreadCheckInterval(1000 * 60 * 60);
 		Vertx newVertx = Vertx.vertx(vertxOptions);
+		newVertx.exceptionHandler(err -> {
+			if ("GC overhead limit exceeded".equals(err.getMessage())) {
+				Set<String> iDs = newVertx.deploymentIDs();
+				for (String did : iDs) {
+					newVertx.undeploy(did);
+				}
+				gcOverheadLimit = true;
+				String msg = ResultFormat.failed(OstCommand.ERROR, "The task exceeds the processing capacity of the console. please set the startup parameter to increase the JVM memory", err.getMessage());
+				LOG.info("执行控制台超过GC开销已停止工作,请重启软件并调大JVM内存!");
+				if (socket != null && !socket.isClosed()) {
+					socket.writeTextMessage(msg);
+					socket.close();
+				}
+			}
+		});
 		LocalDataVertx.put(options.getId(), newVertx);
 		JsonObject config = new JsonObject().put("optionsId", options.getId());
 		DeploymentOptions deployments = new DeploymentOptions();

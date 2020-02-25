@@ -21,7 +21,6 @@ public class HttpServerSupplier {
 				rct.response().setStatusCode(404);
 				int addAndGet = integer.addAndGet(1);
 				if (addAndGet>10) {
-					System.out.println(get.get());
 //					System.exit(0);
 				}
 			} else if (code.contains("5")) {
@@ -35,7 +34,6 @@ public class HttpServerSupplier {
 //				System.exit(0);
 			}
 			socket.handler(body->{
-				System.out.println(body);
 			});
 			socket.writeTextMessage("ok");
 		}).listen(7890);
