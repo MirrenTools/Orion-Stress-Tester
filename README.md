@@ -6,7 +6,7 @@ A simple, efficient and accurate stress tester, support HTTP, WebSocket and TCP
 ## How to run
 The project was created based on [vert.x 3.8.5](https://vertx.io/) ,
 
-Operation environment requirements &gt;= java 1.8(No JDK guidance),
+Operation environment requirements &gt;= java 1.8([Running Orion-Stress-Tester without Java environment](./WithoutJavaEnvironment.md)),
 
 Coding and test environment java 1.8.0_121
 

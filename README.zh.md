@@ -8,7 +8,7 @@ QQ交流群:564658018 <a target="_blank" href="//shang.qq.com/wpa/qunwpa?idkey=3
 ## 如何运行
 该项目基于 [vert.x 3.8.5](https://vertx.io/) 创建,
 
-运行环境要求&gt;= java 1.8(免JDK教程),
+运行环境要求&gt;= java 1.8([在没有java的环境中运行Orion-Stress-Tester](./WithoutJavaEnvironment.zh.md)),
 
 编码与测试环境java 1.8.0_121
 

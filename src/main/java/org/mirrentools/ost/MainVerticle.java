@@ -1,11 +1,13 @@
 package org.mirrentools.ost;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.mirrentools.ost.common.CommandUtil;
 import org.mirrentools.ost.common.Constant;
 import org.mirrentools.ost.common.JvmMetricsUtil;
 import org.mirrentools.ost.common.LocalDataBoolean;
@@ -207,6 +209,13 @@ public class MainVerticle extends AbstractVerticle {
 		}).listen(port, res -> {
 			if (res.succeeded()) {
 				System.out.println("Orion-Stress-Tester running http://127.0.0.1:" + port);
+				try {
+					CommandUtil.browse(new URI("http://127.0.0.1:" + port));
+				} catch (Exception e) {
+					if (LOG.isDebugEnabled()) {
+						LOG.debug("执行打开默认浏览器失败:", e);
+					}
+				}
 				startPromise.complete();
 			} else {
 				LOG.error("Orion-Stress-Tester start failed. If the port is occupied, you can modify the httpport of data/config.json");
